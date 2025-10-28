@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CropGuard — A place to get accurate solutions for your pest attacks</title>
+  <style>
+    /* ========== Variables & Reset ========== */
+    :root{
+      --green-1: #0f5f3a;
+      --green-2: #1a8f5a;
+      --green-3: #bfead4;
+      --accent: #ffd27f;
+      --bg: linear-gradient(180deg, #e9f7ef 0%, #f6fff9 100%);
+      --card: #ffffff;
+      --muted: #64707a;
+      --radius: 12px;
+      --glass: rgba(255,255,255,0.6);
+      --transition: 300ms cubic-bezier(.2,.9,.25,1);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body,#app{height:100%}
+    body{
+      background: var(--bg);
+      color:#073426;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.35;
+      padding:20px;
+    }
+
+    /* ========== App Shell ========== */
+    .container{
+      max-width:1100px;
+      margin:18px auto;
+      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.95));
+      border-radius:16px;
+      box-shadow: 0 12px 40px rgba(2,40,20,0.08);
+      overflow:hidden;
+      min-height:640px;
+      display:flex;
+      flex-direction:column;
+    }
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:20px 28px;
+      border-bottom:1px solid rgba(7,52,38,0.06);
+      background: linear-gradient(90deg, rgba(255,255,255,0.5), rgba(255,255,255,0.2));
+      backdrop-filter: blur(6px);
+    }
+    .brand{
+      display:flex;
+      gap:14px;
+      align-items:center;
+    }
+    .logo{
+      width:52px;height:52px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:28px; background:linear-gradient(135deg,var(--green-2),var(--green-1));
+      color:#fff; box-shadow:0 6px 18px rgba(16,92,60,0.12);
+    }
+    .brand h1{font-size:18px; letter-spacing: -0.2px}
+    .brand p{font-size:12px;color:var(--muted)}
+
+    .header-controls{display:flex;gap:10px;align-items:center}
+    .pill{
+      background:var(--green-3); color:var(--green-1); padding:8px 12px;border-radius:999px;font-weight:600;font-size:13px;
+      box-shadow: 0 6px 18px rgba(26,143,90,0.06);
+    }
+    .btn{
+      background:var(--green-2); color:white; padding:8px 12px;border-radius:8px;border:0;cursor:pointer;
+      transition: transform var(--transition), box-shadow var(--transition);
+      font-weight:600;
+    }
+    .btn.secondary{
+      background:transparent;color:var(--green-1);border:1px solid rgba(15,95,58,0.08);
+    }
+    .btn:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(15,95,58,0.12)}
+
+    /* ========== Pages area ========== */
+    .pages{
+      padding:48px;
+      flex:1;
+      position:relative;
+      overflow:hidden;
+    }
+    .page{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      transform: translateY(12px) scale(.995);
+      transition: opacity var(--transition), transform var(--transition);
+      pointer-events:none;
+      padding: 20px 40px;
+      overflow:auto;
+    }
+    .page.active{
+      opacity:1;
+      transform: translateY(0) scale(1);
+      pointer-events:auto;
+    }
+
+    /* ========== Start / Hero ========== */
+    .hero{
+      height:calc(100% - 40px);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;
+    }
+    .robot{
+      font-size:96px;
+      filter: drop-shadow(0 24px 30px rgba(16,92,60,0.12));
+      transform-origin:center;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float{
+      0%{transform: translateY(0) rotate(-3deg)}
+      50%{transform: translateY(-8px) rotate(3deg)}
+      100%{transform: translateY(0) rotate(-3deg)}
+    }
+
+    /* moving title bar */
+    .marquee-wrap{
+      width:100%;
+      max-width:720px;
+      height:56px;
+      overflow:hidden;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(20,80,50,0.06), rgba(30,120,70,0.02));
+      border: 1px solid rgba(11,57,36,0.06);
+      display:flex;align-items:center;justify-content:flex-start;
+    }
+    .marquee{
+      display:inline-block;
+      white-space:nowrap;
+      padding-left:100%;
+      font-weight:800;
+      color:var(--green-1);
+      font-size:20px;
+      animation: marquee 10s linear infinite;
+      letter-spacing:1px;
+    }
+    @keyframes marquee{
+      0%{transform: translateX(0)}
+      100%{transform: translateX(-100%)}
+    }
+
+    .hero .cta{
+      display:flex;gap:12px;align-items:center;
+    }
+    .get-start{
+      font-size:18px;padding:14px 22px;border-radius:12px;border:0;background:linear-gradient(90deg,var(--green-2),var(--green-1));
+      color:#fff; cursor:pointer; box-shadow: 0 10px 30px rgba(26,143,90,0.12);
+      transition: transform var(--transition);
+    }
+    .get-start:hover{transform:translateY(-4px)}
+
+    /* ========== Form (Survey) ========== */
+    .form-card{
+      width:720px;max-width:100%;
+      margin:0 auto;
+      background:var(--card);
+      border-radius:12px;padding:20px 22px;
+      box-shadow: 0 10px 30px rgba(7,52,38,0.04);
+      border:1px solid rgba(7,52,38,0.04);
+      transition: box-shadow var(--transition);
+    }
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .form-row{margin-bottom:12px}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input[type="text"], input[type="email"], select, textarea{
+      width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(7,52,38,0.06);font-size:14px;
+      background:linear-gradient(180deg,#fff,#fbfffb);
+    }
+    textarea{min-height:100px;resize:vertical}
+    .form-actions{display:flex;justify-content:flex-end;margin-top:12px;gap:8px}
+
+    /* ========== Dashboard ========== */
+    .dashboard-grid{
+      display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;
+    }
+    .panel{
+      background:var(--card);padding:18px;border-radius:12px;border:1px solid rgba(7,52,38,0.04);
+      box-shadow: 0 8px 30px rgba(7,52,38,0.04);
+    }
+    .farm-info{display:flex;gap:12px;align-items:center}
+    .id-badge{background:linear-gradient(180deg,var(--green-3),#dff9e6);padding:10px 12px;border-radius:10px;font-weight:700;color:var(--green-1)}
+    .dash-actions{display:flex;gap:10px;justify-content:flex-end}
+    .big-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+    .big-btn{
+      padding:26px;border-radius:12px;background:linear-gradient(180deg,#fff,var(--green-3));
+      display:flex;flex-direction:column;align-items:flex-start;gap:8px;border:1px solid rgba(7,52,38,0.04);
+      cursor:pointer;transition:transform var(--transition), box-shadow var(--transition);
+    }
+    .big-btn:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(7,52,38,0.08)}
+    .big-btn h3{margin:0;color:var(--green-1)}
+    .small-muted{font-size:13px;color:var(--muted)}
+
+    /* ========== Lists & Cards ========== */
+    .list{display:flex;flex-direction:column;gap:10px}
+    .location-card{display:flex;justify-content:space-between;gap:12px;padding:12px;border-radius:10px;background:linear-gradient(90deg,#fff,#fbfff8);border:1px solid rgba(7,52,38,0.04)}
+    .price{font-weight:700;color:var(--green-1)}
+
+    /* ========== Advice & Dynamic content ========== */
+    .advice-item{padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#f6fff4);border:1px solid rgba(7,52,38,0.04)}
+    .step-list{display:flex;flex-direction:column;gap:8px}
+    .step{
+      padding:12px;border-radius:8px;background:linear-gradient(180deg,#fff,#fcfff9);border-left:4px solid var(--green-2);
+    }
+
+    /* ========== Footer small ========== */
+    .muted-footer{font-size:13px;color:var(--muted);text-align:center;margin-top:18px}
+
+    /* responsive */
+    @media (max-width:880px){
+      .dashboard-grid{grid-template-columns:1fr; }
+      header{padding:14px}
+      .marquee{font-size:16px}
+      .brand h1{font-size:15px}
+      .robot{font-size:72px}
+      .hero{padding:16px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <header>
+      <div class="brand">
+        <div class="logo">🌾</div>
+        <div>
+          <h1>CropGuard</h1>
+          <p>A place to get accurate solutions for your pest attacks</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <div class="pill" id="user-display">Not signed in</div>
+        <button class="btn secondary" id="dashboardTopBtn" title="Go to dashboard" style="display:none">Dashboard</button>
+      </div>
+    </header>
+
+    <main class="pages">
+      <!-- START PAGE -->
+      <section id="start" class="page active">
+        <div class="hero" role="region" aria-label="Start page">
+          <div class="robot" aria-hidden="true">🤖</div>
+
+          <div class="marquee-wrap" aria-hidden="false">
+            <div class="marquee">CropGuard — "A place to get accurate solutions for your pest attacks" &nbsp; • &nbsp; Accurate, localized advice for pests & weeds — Protect your yield!</div>
+          </div>
+
+          <div class="cta">
+            <button class="get-start" id="openSurvey">Get started</button>
+          </div>
+
+          <p class="muted-footer">Professional, pesticide-aware advice — built with farmers in mind.</p>
+        </div>
+      </section>
+
+      <!-- SURVEY PAGE -->
+      <section id="survey" class="page" aria-hidden="true">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+          <h2>Farmer survey</h2>
+          <button class="btn secondary" id="surveyToDashboard">Back to Dashboard</button>
+        </div>
+
+        <div class="form-card" role="form" aria-label="Farmer survey form">
+          <form id="surveyForm">
+            <div class="form-grid">
+              <div class="form-row">
+                <label for="farmerName">Farmer name</label>
+                <input required id="farmerName" name="farmerName" type="text" placeholder="e.g., Rajesh Kumar" />
+              </div>
+
+              <div class="form-row">
+                <label for="fieldLocation">Location of the field (village / district)</label>
+                <input required id="fieldLocation" name="fieldLocation" type="text" placeholder="e.g., Palampur, Himachal" />
+              </div>
+
+              <div class="form-row">
+                <label for="fieldSize">Size of the field (acres / hectares)</label>
+                <input required id="fieldSize" name="fieldSize" type="text" placeholder="e.g., 2 acres" />
+              </div>
+
+              <div class="form-row">
+                <label for="cropType">Crop grown</label>
+                <input required id="cropType" name="cropType" type="text" placeholder="e.g., Cotton, Wheat" />
+              </div>
+
+              <div class="form-row">
+                <label for="pestName">Name of pest attacked</label>
+                <input required id="pestName" name="pestName" type="text" placeholder="e.g., Pink ballworm" />
+              </div>
+
+              <div class="form-row">
+                <label for="notes">Additional notes (optional)</label>
+                <textarea id="notes" name="notes" placeholder="Any further observations..."></textarea>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn secondary" id="cancelSurvey">Cancel</button>
+              <button type="submit" class="btn">Submit & Go to Dashboard</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- DASHBOARD PAGE -->
+      <section id="dashboard" class="page" aria-hidden="true">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+          <div class="farm-info">
+            <div class="id-badge" id="farmerBadge">Farmer</div>
+            <div>
+              <div style="font-weight:800;font-size:18px" id="farmerNameDisplay">—</div>
+              <div class="small-muted" id="farmerLocationDisplay">—</div>
+            </div>
+          </div>
+
+          <div class="dash-actions">
+            <button class="btn secondary" id="surveyAgain">Survey again</button>
+            <button class="btn secondary" id="feedbackBtn">Feedback</button>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="panel">
+            <h3>Overview</h3>
+            <p class="small-muted">Personalized dashboard based on your latest survey.</p>
+            <div style="height:16px"></div>
+
+            <div class="big-grid">
+              <div class="big-btn" id="btnMarket">
+                <h3>Market</h3>
+                <div class="small-muted">Find fertilizers, pesticides & weedicides nearby</div>
+              </div>
+
+              <div class="big-btn" id="btnAdvices">
+                <h3>Advices</h3>
+                <div class="small-muted">Pest-specific advice and home remedies</div>
+              </div>
+
+              <div class="big-btn" id="btnPestInfo">
+                <h3>Pest Info</h3>
+                <div class="small-muted">Detailed descriptions of pests & weeds</div>
+              </div>
+
+              <div class="big-btn" id="btnTreatment">
+                <h3>Treatment</h3>
+                <div class="small-muted">Step-by-step treatment & containment</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h4>Quick summary</h4>
+            <div style="height:10px"></div>
+            <div class="list" id="summaryList">
+              <div class="small-muted">Farmer: <strong id="summaryFarmer">—</strong></div>
+              <div class="small-muted">Field size: <strong id="summarySize">—</strong></div>
+              <div class="small-muted">Crop: <strong id="summaryCrop">—</strong></div>
+              <div class="small-muted">Pest: <strong id="summaryPest">—</strong></div>
+              <div style="height:14px"></div>
+              <div class="small-muted">Tip: Click any section to explore.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MARKET PAGE -->
+      <section id="market" class="page" aria-hidden="true">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2>Market – Nearby suppliers</h2>
+          <div>
+            <button class="btn secondary" id="marketToDash">Dashboard</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <p class="small-muted">Showing a few nearby locations and approximate prices for common products.</p>
+          <div style="height:12px"></div>
+
+          <div class="list" id="marketList">
+            <!-- JS will populate -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ADVICES PAGE -->
+      <section id="advices" class="page" aria-hidden="true">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2>Advices — Pest-specific recommendations</h2>
+          <div>
+            <button class="btn secondary" id="advicesToDash">Dashboard</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div id="advicesContent">
+            <!-- JS will populate -->
+          </div>
+        </div>
+      </section>
+
+      <!-- PEST INFO PAGE -->
+      <section id="pestinfo" class="page" aria-hidden="true">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2>Pest Information</h2>
+          <div>
+            <button class="btn secondary" id="pestinfoToDash">Dashboard</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div id="pestInfoContent">
+            <!-- JS will populate -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TREATMENT PAGE -->
+      <section id="treatment" class="page" aria-hidden="true">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2>Treatment — Step-by-step</h2>
+          <div>
+            <button class="btn secondary" id="treatmentToDash">Dashboard</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div id="treatmentContent">
+            <!-- JS will populate -->
+          </div>
+        </div>
+      </section>
+
+      <!-- FEEDBACK PAGE -->
+      <section id="feedback" class="page" aria-hidden="true">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2>Feedback</h2>
+          <div>
+            <button class="btn secondary" id="feedbackToDash">Dashboard</button>
+          </div>
+        </div>
+
+        <div class="panel" style="text-align:center">
+          <p style="font-size:16px;font-weight:700;color:var(--green-1)">Email us</p>
+          <p style="margin-top:6px"><a href="mailto:kavya11510272@gmail.com" style="color:var(--green-2);text-decoration:none;font-weight:700">kavya11510272@gmail.com</a></p>
+          <p style="margin-top:14px;color:var(--muted)"><em>"We are always here to help you grow!"</em></p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    /* ===================== App Logic (single-file SPA) ===================== */
+
+    // Utility: simple query
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+    // Elements
+    const pages = {
+      start: $('#start'),
+      survey: $('#survey'),
+      dashboard: $('#dashboard'),
+      market: $('#market'),
+      advices: $('#advices'),
+      pestinfo: $('#pestinfo'),
+      treatment: $('#treatment'),
+      feedback: $('#feedback')
+    };
+    const headerUser = $('#user-display');
+    const dashboardTopBtn = $('#dashboardTopBtn');
+
+    // App state persisted in localStorage
+    const STORAGE_KEY = 'cropguard_user_v1';
+    let state = {
+      farmerName: '',
+      fieldLocation: '',
+      fieldSize: '',
+      cropType: '',
+      pestName: '',
+      notes: '',
+      farmerId: ''
+    };
+
+    function loadState(){
+      try{
+        const s = localStorage.getItem(STORAGE_KEY);
+        if(s) {
+          Object.assign(state, JSON.parse(s));
+        }
+      }catch(e){ console.warn(e) }
+    }
+    function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+    // Navigation helper
+    function show(pageKey){
+      Object.keys(pages).forEach(k=>{
+        pages[k].classList.remove('active');
+        pages[k].setAttribute('aria-hidden','true');
+      });
+      pages[pageKey].classList.add('active');
+      pages[pageKey].setAttribute('aria-hidden','false');
+
+      // header small state
+      if(pageKey === 'dashboard'){
+        dashboardTopBtn.style.display = 'none';
+      } else {
+        dashboardTopBtn.style.display = state.farmerName ? 'inline-block' : 'none';
+      }
+
+      // analytics-ish small console
+      console.debug('[CropGuard] page:', pageKey);
+    }
+
+    // generate a friendly ID
+    function generateId(){
+      const t = Date.now().toString(36).slice(-6).toUpperCase();
+      const r = Math.random().toString(36).slice(2,6).toUpperCase();
+      return `${t}-${r}`;
+    }
+
+    // wire start -> survey
+    $('#openSurvey').addEventListener('click', ()=>{
+      show('survey');
+    });
+
+    // Survey: submit
+    const surveyForm = $('#surveyForm');
+    surveyForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const data = new FormData(surveyForm);
+      state.farmerName = data.get('farmerName').trim();
+      state.fieldLocation = data.get('fieldLocation').trim();
+      state.fieldSize = data.get('fieldSize').trim();
+      state.cropType = data.get('cropType').trim();
+      state.pestName = data.get('pestName').trim();
+      state.notes = data.get('notes').trim();
+      if(!state.farmerId) state.farmerId = generateId();
+      saveState();
+      refreshUI();
+      show('dashboard');
+    });
+
+    $('#cancelSurvey').addEventListener('click', ()=>{
+      // if user has data go to dashboard otherwise start
+      if(state.farmerName) show('dashboard');
+      else show('start');
+    });
+
+    // Dashboard wiring
+    function refreshUI(){
+      headerUser.textContent = state.farmerName ? `${state.farmerName} • ${state.farmerId}` : 'Not signed in';
+      $('#farmerBadge').textContent = state.farmerId ? state.farmerId : '—';
+      $('#farmerNameDisplay').textContent = state.farmerName || '—';
+      $('#farmerLocationDisplay').textContent = state.fieldLocation ? `${state.fieldLocation}` : '—';
+      $('#summaryFarmer').textContent = state.farmerName || '—';
+      $('#summarySize').textContent = state.fieldSize || '—';
+      $('#summaryCrop').textContent = state.cropType || '—';
+      $('#summaryPest').textContent = state.pestName || '—';
+      // top right dashboard button visibility
+      if(state.farmerName){
+        dashboardTopBtn.style.display = 'none';
+      } else {
+        dashboardTopBtn.style.display = 'none';
+      }
+    }
+
+    // top header dashboard button goes to dashboard
+    dashboardTopBtn.addEventListener('click', ()=> show('dashboard'));
+
+    // survey again
+    $('#surveyAgain').addEventListener('click', ()=>{
+      // prefill form
+      $('#farmerName').value = state.farmerName || '';
+      $('#fieldLocation').value = state.fieldLocation || '';
+      $('#fieldSize').value = state.fieldSize || '';
+      $('#cropType').value = state.cropType || '';
+      $('#pestName').value = state.pestName || '';
+      $('#notes').value = state.notes || '';
+      show('survey');
+    });
+
+    // feedback
+    $('#feedbackBtn').addEventListener('click', ()=> show('feedback'));
+
+    // dashboard grid actions
+    $('#btnMarket').addEventListener('click', ()=> { populateMarket(); show('market'); });
+    $('#btnAdvices').addEventListener('click', ()=> { populateAdvices(); show('advices'); });
+    $('#btnPestInfo').addEventListener('click', ()=> { populatePestInfo(); show('pestinfo'); });
+    $('#btnTreatment').addEventListener('click', ()=> { populateTreatment(); show('treatment'); });
+
+    // every page except start and dashboard has a top-right Dashboard button as required
+    $('#marketToDash').addEventListener('click', ()=> show('dashboard'));
+    $('#advicesToDash').addEventListener('click', ()=> show('dashboard'));
+    $('#pestinfoToDash').addEventListener('click', ()=> show('dashboard'));
+    $('#treatmentToDash').addEventListener('click', ()=> show('dashboard'));
+    $('#feedbackToDash').addEventListener('click', ()=> show('dashboard'));
+    $('#surveyToDashboard').addEventListener('click', ()=> show('dashboard'));
+
+    // ========== Content generation data ==========
+
+    // Example market data (mock). Real app would call an API.
+    const marketData = [
+      {
+        location: "Green Agro Store, Central Market",
+        items: [
+          {name:"Urea (50kg)", price:"₹1,100"},
+          {name:"Lambda-cyhalothrin insecticide (1L)", price:"₹420"},
+          {name:"Glyphosate (1L)", price:"₹280"}
+        ],
+        distance:"3.2 km"
+      },
+      {
+        location: "Rural Supplies, East Bazaar",
+        items: [
+          {name:"DAP (50kg)", price:"₹2,100"},
+          {name:"Azadirachtin (biopesticide) (250ml)", price:"₹260"}
+        ],
+        distance:"7.8 km"
+      },
+      {
+        location: "Farmers' Co-op, Village Center",
+        items: [
+          {name:"Organic compost (50kg)", price:"₹450"},
+          {name:"Neem oil (1L)", price:"₹350"},
+          {name:"Recommended weedicides (small)", price:"₹150"}
+        ],
+        distance:"1.6 km"
+      }
+    ];
+
+    // pest encyclopedia (simplified short entries)
+    const pestEncyclopedia = {
+      "pink ballworm": {
+        commonName: "Pink Ballworm",
+        description: "A caterpillar that bores into cotton bolls and other fruits causing yield loss.",
+        signs: ["Holes in bolls or fruit", "Frass (sawdust-like droppings)", "Premature fruit drop"],
+        biology: "Larvae bore into fruit; several generations per year depending on climate."
+      },
+      "aphids": {
+        commonName: "Aphids",
+        description: "Small soft-bodied insects that suck plant sap and may transmit viruses.",
+        signs: ["Curling leaves", "Sticky honeydew", "Sooty mold"],
+        biology: "Rapid reproduction; often controlled by natural enemies or insecticidal soaps."
+      },
+      "stem borer": {
+        commonName: "Stem borer",
+        description: "Moth larvae that bore into stems, weakening plants and causing lodging.",
+        signs: ["Yellowing", "Dead heart in seedlings", "Holes in stems"],
+        biology: "Eggs laid on leaves; larvae bore into stem soon after hatching."
+      },
+      "weeds (general)": {
+        commonName: "Weeds",
+        description: "Competing plants that reduce yield; control through cultural, mechanical or chemical methods.",
+        signs: ["Dense unwanted plants", "Reduced crop vigor"],
+        biology: "Various species; identification helps select correct control."
+      }
+    };
+
+    // advices generator (basic, example-based)
+    function generateAdviceFor(pestName){
+      const key = (pestName || '').trim().toLowerCase();
+      if(!key) return {
+        title: "No pest specified",
+        advices: ["Please fill in pest name in the survey for tailored advice."]
+      };
+
+      if(key.includes('pink') && key.includes('ball')){
+        return {
+          title: "Pink Ballworm — tailored advice",
+          advices:[
+            "Inspect bolls regularly. Remove and destroy infested bolls to reduce larvae.",
+            "Use pheromone traps to monitor adult moth activity and time control.",
+            "Apply appropriate insecticides at egg hatch or early larval stages (consult local extension for approved chemicals and timing).",
+            "Encourage natural predators (lacewings, parasitoids). Avoid broad-spectrum sprays that kill beneficial insects.",
+            "Rotate crops and manage volunteer plants to break life-cycle."
+          ],
+          homeRemedies: [
+            "Timely hand-removal of infested bolls.",
+            "Deploy light or pheromone traps to reduce adult numbers.",
+            "Maintain field hygiene to reduce refuge for larvae."
+          ]
+        };
+      }
+
+      if(key.includes('aphid')){
+        return {
+          title: "Aphids — practical steps",
+          advices:[
+            "Release/encourage natural enemies (ladybirds, lacewings).",
+            "Use strong water sprays to dislodge colonies on small plants.",
+            "Apply insecticidal soap or neem-based products for localized infestations.",
+            "Avoid high-nitrogen fertilizer which encourages aphid outbreaks."
+          ],
+          homeRemedies: [
+            "Spray a mild solution of neem oil + soap (spot test first).",
+            "Use reflective mulches in some crops to reduce settlement."
+          ]
+        };
+      }
+
+      if(key.includes('stem') || key.includes('borer')){
+        return {
+          title: "Stem borer — containment & treatment",
+          advices:[
+            "Destroy infested stubbles and residues after harvest.",
+            "Use pheromone or light traps to reduce adults",
+            "Apply selective insecticides targeting early larvae (follow local recommendations)."
+          ],
+          homeRemedies:[
+            "Uproot and burn heavily infested plants to reduce larval population.",
+            "Crop rotation and resistant varieties when available."
+          ]
+        };
+      }
+
+      // default generic response
+      return {
+        title: `Advice for "${pestName}"`,
+        advices:[
+          "Confirm the pest identity before applying any chemical control.",
+          "Monitor pest levels regularly and take action based on thresholds.",
+          "Prefer IPM (Integrated Pest Management): combine cultural, biological and chemical tactics.",
+          "Consult local agricultural extension for exact product names and dosages."
+        ],
+        homeRemedies:[
+          "Hand removal where feasible for small infestations.",
+          "Neem-based sprays for many chewing/sucking pests as a low-toxicity option."
+        ]
+      };
+    }
+
+    // treatment generator (simple steps)
+    function generateTreatmentFor(pestName){
+      const p = (pestName||'').toLowerCase();
+      if(!p) return [{title:'No pest specified', steps:['Complete the survey with a pest name to get a treatment plan.']}] ;
+
+      if(p.includes('pink') && p.includes('ball')){
+        return [
+          {title:'Step 1 — Assess', steps:['Survey all plants and mark infested bolls. Determine infestation percentage.']},
+          {title:'Step 2 — Sanitation', steps:['Remove infested bolls and destroy them off-field. Remove volunteers.']},
+          {title:'Step 3 — Monitoring', steps:['Deploy pheromone traps and monitor adult catches to time sprays.']},
+          {title:'Step 4 — Chemical control (when necessary)', steps:['Use a recommended insecticide at recommended dose targeting early larvae (consult extension). Wear PPE.']},
+          {title:'Step 5 — Follow-up', steps:['Re-check fields 7–10 days after treatment. Record results and adjust actions.']}
+        ];
+      }
+
+      // generic treatment
+      return [
+        {title:'Step 1 — Confirm & Monitor', steps:['Identify the pest correctly. Monitor population density.']},
+        {title:'Step 2 — Cultural controls', steps:['Remove infected plant parts, rotate crops, adjust irrigation/fertilization to reduce pest favorability.']},
+        {title:'Step 3 — Biological controls', steps:['Encourage predators or use biopesticides where available.']},
+        {title:'Step 4 — Chemical controls (last resort)', steps:['Choose targeted, approved products and follow label instructions.']},
+        {title:'Step 5 — Record & Evaluate', steps:['Log interventions and outcomes; adapt strategy next season.']}
+      ];
+    }
+
+    // ================= Populate pages =================
+
+    function populateMarket(){
+      const wrap = $('#marketList');
+      wrap.innerHTML = '';
+      marketData.forEach(loc=>{
+        const el = document.createElement('div');
+        el.className = 'location-card';
+        el.innerHTML = `
+          <div>
+            <div style="font-weight:800">${loc.location}</div>
+            <div class="small-muted">${loc.distance}</div>
+            <div style="height:8px"></div>
+            <div>${loc.items.map(i=>`<div style="font-size:14px">${i.name} — <span class="price">${i.price}</span></div>`).join('')}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:8px">
+            <button class="btn" style="padding:8px 10px" onclick="alert('Open directions on your device — demo only')">Get directions</button>
+            <button class="btn secondary" style="padding:8px 10px" onclick="alert('Call supplier — demo only')">Contact</button>
+          </div>
+        `;
+        wrap.appendChild(el);
+      });
+    }
+
+    function populatePestInfo(){
+      const wrap = $('#pestInfoContent');
+      wrap.innerHTML = '';
+
+      // create cards for each pest
+      Object.keys(pestEncyclopedia).forEach(key=>{
+        const p = pestEncyclopedia[key];
+        const card = document.createElement('div');
+        card.className = 'advice-item';
+        card.style.marginBottom = '12px';
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+            <div>
+              <div style="font-weight:800">${p.commonName}</div>
+              <div class="small-muted" style="margin-top:6px">${p.description}</div>
+              <div style="height:8px"></div>
+              <div style="font-size:13px"><strong>Signs:</strong> ${p.signs.join(', ')}</div>
+              <div style="font-size:13px;margin-top:6px"><strong>Biology:</strong> ${p.biology}</div>
+            </div>
+            <div style="text-align:right">
+              <button class="btn secondary" onclick="showAdviceFromInfo('${escapeHtml(key)}')">Get specific advice</button>
+            </div>
+          </div>
+        `;
+        wrap.appendChild(card);
+      });
+
+      // small helper function exposed globally for the inline onclick to work
+      window.showAdviceFromInfo = function(pKey){
+        show('advices');
+        // unescape
+        const key = pKey;
+        // prefill advice area based on key
+        const name = key;
+        state.pestName = key;
+        saveState();
+        populateAdvices();
+      };
+    }
+
+    function populateAdvices(){
+      const wrap = $('#advicesContent');
+      wrap.innerHTML = '';
+
+      const pest = state.pestName || '';
+      const advice = generateAdviceFor(pest);
+
+      const heading = document.createElement('div');
+      heading.innerHTML = `<h3 style="margin-bottom:8px">${advice.title}</h3><div class="small-muted">Based on: <strong>${pest || '—'}</strong></div><div style="height:12px"></div>`;
+      wrap.appendChild(heading);
+
+      // advices
+      advice.advices.forEach(a=>{
+        const it = document.createElement('div');
+        it.className = 'advice-item';
+        it.innerHTML = `<div style="font-weight:700;margin-bottom:6px">Recommended</div><div style="color:var(--muted)">${a}</div>`;
+        wrap.appendChild(it);
+      });
+
+      // home remedies
+      if(advice.homeRemedies && advice.homeRemedies.length){
+        const hrWrap = document.createElement('div');
+        hrWrap.style.marginTop = '12px';
+        hrWrap.innerHTML = `<div style="font-weight:700;margin-bottom:8px">Home remedies / low-toxicity options</div>`;
+        advice.homeRemedies.forEach(h=>{
+          const it = document.createElement('div');
+          it.className = 'advice-item';
+          it.style.marginTop = '8px';
+          it.innerHTML = `<div style="color:var(--muted)">${h}</div>`;
+          hrWrap.appendChild(it);
+        });
+        wrap.appendChild(hrWrap);
+      }
+
+      // safety note
+      const note = document.createElement('div');
+      note.style.marginTop = '14px';
+      note.className = 'small-muted';
+      note.textContent = 'Safety: Always check local extension recommendations and registered products for your region. Use Personal Protective Equipment when handling chemicals.';
+      wrap.appendChild(note);
+    }
+
+    function populateTreatment(){
+      const wrap = $('#treatmentContent');
+      wrap.innerHTML = '';
+      const pest = state.pestName || '';
+      const plan = generateTreatmentFor(pest);
+
+      plan.forEach(item=>{
+        const card = document.createElement('div');
+        card.className = 'advice-item';
+        card.style.marginBottom = '12px';
+        card.innerHTML = `<div style="font-weight:800;margin-bottom:8px">${item.title}</div>
+          <div class="step-list">
+            ${item.steps.map(s=>`<div class="step">${escapeHtml(s)}</div>`).join('')}
+          </div>`;
+        wrap.appendChild(card);
+      });
+
+      const caution = document.createElement('div');
+      caution.className = 'small-muted';
+      caution.style.marginTop = '12px';
+      caution.textContent = 'Note: This is a general plan—consult local plant protection/extension services for region-specific treatments and exact product dosages.';
+      wrap.appendChild(caution);
+    }
+
+    // Escape html helper for inline usage
+    function escapeHtml(s){
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // initial load
+    loadState();
+    refreshUI();
+
+    // If user already provided data, go to dashboard, else start page
+    if(state.farmerName) {
+      // ensure form prefilled
+      $('#farmerName').value = state.farmerName;
+      $('#fieldLocation').value = state.fieldLocation;
+      $('#fieldSize').value = state.fieldSize;
+      $('#cropType').value = state.cropType;
+      $('#pestName').value = state.pestName;
+      $('#notes').value = state.notes;
+      show('dashboard');
+    } else {
+      show('start');
+    }
+
+    // small accessibility: pressing Esc returns to dashboard
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape') show('dashboard');
+    });
+
+    // micro-animations: re-trigger marquee when focus changes (keeps lively)
+    document.addEventListener('visibilitychange', ()=>{
+      if(!document.hidden){
+        const m = document.querySelector('.marquee');
+        if(m){
+          m.style.animation = 'none';
+          void m.offsetWidth;
+          m.style.animation = '';
+        }
+      }
+    });
+
+    // Expose a tiny debug function to clear storage (for dev)
+    window._cropguard_clear = function(){
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    };
+
+    // small friendly console message
+    console.log('%cCropGuard loaded — happy farming!','color: #0a7a50; font-weight:700');
+
+  </script>
+
+  <!-- ========== ADDED: Logout feature (keeps original file unchanged, only appended feature) ========== -->
+  <script>
+    // This script appends a "Logout" button to the header-controls area and
+    // clears the saved survey (localStorage) so the next opening behaves like a fresh login.
+    (function(){
+      try {
+        const container = document.querySelector('.header-controls');
+        if(!container) return;
+
+        // Create logout button (visually consistent with existing buttons)
+        const logoutBtn = document.createElement('button');
+        logoutBtn.className = 'btn secondary';
+        logoutBtn.id = 'logoutBtn';
+        logoutBtn.title = 'Logout (clear saved survey)';
+        logoutBtn.textContent = 'Logout';
+
+        // Append after existing controls
+        container.appendChild(logoutBtn);
+
+        // Click handler: confirm, then clear storage and reset in-memory state and UI
+        logoutBtn.addEventListener('click', ()=>{
+          const ok = confirm('Logout and clear saved survey on this device? You will be returned to the start screen.');
+          if(!ok) return;
+
+          // Remove saved state from localStorage
+          try { localStorage.removeItem(STORAGE_KEY); } catch(e){ console.warn('Could not remove storage', e); }
+
+          // Reset in-memory state (do not reload the page to keep the app smooth)
+          try {
+            if(typeof state === 'object') {
+              for (const k in state) {
+                if (Object.prototype.hasOwnProperty.call(state, k)) {
+                  // preserve structure but clear values
+                  if (typeof state[k] === 'string') state[k] = '';
+                  else if (Array.isArray(state[k])) state[k] = [];
+                  else state[k] = null;
+                }
+              }
+              // ensure farmerId empty
+              state.farmerId = '';
+            }
+          } catch(e){ console.warn(e); }
+
+          // Clear form fields if present
+          try {
+            const fields = ['#farmerName','#fieldLocation','#fieldSize','#cropType','#pestName','#notes'];
+            fields.forEach(sel=>{
+              const el = document.querySelector(sel);
+              if(el) el.value = '';
+            });
+          } catch(e){ /* ignore */ }
+
+          // Update UI: header pill and displays
+          try {
+            if(window.refreshUI && typeof refreshUI === 'function') {
+              refreshUI();
+            } else {
+              const userDisplay = document.getElementById('user-display');
+              if(userDisplay) userDisplay.textContent = 'Not signed in';
+              const badge = document.getElementById('farmerBadge');
+              if(badge) badge.textContent = '—';
+              const nameDisp = document.getElementById('farmerNameDisplay');
+              if(nameDisp) nameDisp.textContent = '—';
+              const locDisp = document.getElementById('farmerLocationDisplay');
+              if(locDisp) locDisp.textContent = '—';
+              const summaryEls = ['summaryFarmer','summarySize','summaryCrop','summaryPest'];
+              summaryEls.forEach(id=>{
+                const el = document.getElementById(id);
+                if(el) el.textContent = '—';
+              });
+            }
+          } catch(e){ console.warn(e); }
+
+          // Navigate to start page so it feels like fresh login
+          try { if(window.show && typeof show === 'function') show('start'); } catch(e){ /* ignore */ }
+
+          // Optional small message
+          try { alert('Logged out. The saved survey was cleared from this device.'); } catch(e){ /* ignore */ }
+        });
+      } catch(err) {
+        console.warn('Logout feature failed to initialize', err);
+      }
+    })();
+  </script>
+</body>
+</html>
