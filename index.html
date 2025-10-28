@@ -1,0 +1,1519 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CropGuard — A place to get accurate solutions for your pest attacks</title>
+  <style>
+    /* ========== Variables & Reset ========== */
+    :root{
+      --green-1: #0f5f3a;
+      --green-2: #1a8f5a;
+      --green-3: #bfead4;
+      --accent: #ffd27f;
+      --bg: linear-gradient(180deg, #e9f7ef 0%, #f6fff9 100%);
+      --card: #ffffff;
+      --muted: #64707a;
+      --radius: 12px;
+      --glass: rgba(255,255,255,0.6);
+      --transition: 300ms cubic-bezier(.2,.9,.25,1);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body,#app{height:100%}
+    body{
+      background: var(--bg);
+      color:#073426;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.35;
+      padding:20px;
+    }
+
+/* ========== App Shell ========== */
+.container{
+  max-width:1100px;
+  margin:18px auto;
+  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.95));
+  border-radius:16px;
+  box-shadow: 0 12px 40px rgba(2,40,20,0.08);
+  overflow:hidden;
+  min-height:640px;
+  display:flex;
+  flex-direction:column;
+}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:20px 28px;
+  border-bottom:1px solid rgba(7,52,38,0.06);
+  background: linear-gradient(90deg, rgba(255,255,255,0.5), rgba(255,255,255,0.2));
+  backdrop-filter: blur(6px);
+}
+.brand{
+  display:flex;
+  gap:14px;
+  align-items:center;
+}
+.logo{
+  width:52px;height:52px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px; background:linear-gradient(135deg,var(--green-2),var(--green-1));
+  color:#fff; box-shadow:0 6px 18px rgba(16,92,60,0.12);
+}
+.brand h1{font-size:18px; letter-spacing: -0.2px}
+.brand p{font-size:12px;color:var(--muted)}
+
+.header-controls{display:flex;gap:10px;align-items:center}
+.pill{
+  background:var(--green-3); color:var(--green-1); padding:8px 12px;border-radius:999px;font-weight:600;font-size:13px;
+  box-shadow: 0 6px 18px rgba(26,143,90,0.06);
+}
+.btn{
+  background:var(--green-2); color:white; padding:8px 12px;border-radius:8px;border:0;cursor:pointer;
+  transition: transform var(--transition), box-shadow var(--transition);
+  font-weight:600;
+}
+.btn.secondary{
+  background:transparent;color:var(--green-1);border:1px solid rgba(15,95,58,0.08);
+}
+.btn:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(15,95,58,0.12)}
+
+/* ========== Pages area ========== */
+.pages{
+  padding:48px;
+  flex:1;
+  position:relative;
+  overflow:hidden;
+}
+.page{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transform: translateY(12px) scale(.995);
+  transition: opacity var(--transition), transform var(--transition);
+  pointer-events:none;
+  padding: 20px 40px;
+  overflow:auto;
+}
+.page.active{
+  opacity:1;
+  transform: translateY(0) scale(1);
+  pointer-events:auto;
+}
+
+/* ========== Start / Hero ========== */
+.hero{
+  height:calc(100% - 40px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;
+}
+.robot{
+  font-size:96px;
+  filter: drop-shadow(0 24px 30px rgba(16,92,60,0.12));
+  transform-origin:center;
+  animation: float 4s ease-in-out infinite;
+}
+@keyframes float{
+  0%{transform: translateY(0) rotate(-3deg)}
+  50%{transform: translateY(-8px) rotate(3deg)}
+  100%{transform: translateY(0) rotate(-3deg)}
+}
+
+/* moving title bar */
+.marquee-wrap{
+  width:100%;
+  max-width:720px;
+  height:56px;
+  overflow:hidden;
+  border-radius:999px;
+  background: linear-gradient(90deg, rgba(20,80,50,0.06), rgba(30,120,70,0.02));
+  border: 1px solid rgba(11,57,36,0.06);
+  display:flex;align-items:center;justify-content:flex-start;
+}
+.marquee{
+  display:inline-block;
+  white-space:nowrap;
+  padding-left:100%;
+  font-weight:800;
+  color:var(--green-1);
+  font-size:20px;
+  animation: marquee 10s linear infinite;
+  letter-spacing:1px;
+}
+@keyframes marquee{
+  0%{transform: translateX(0)}
+  100%{transform: translateX(-100%)}
+}
+
+.hero .cta{
+  display:flex;gap:12px;align-items:center;
+}
+.get-start{
+  font-size:18px;padding:14px 22px;border-radius:12px;border:0;background:linear-gradient(90deg,var(--green-2),var(--green-1));
+  color:#fff; cursor:pointer; box-shadow: 0 10px 30px rgba(26,143,90,0.12);
+  transition: transform var(--transition);
+}
+.get-start:hover{transform:translateY(-4px)}
+
+/* ========== Form (Survey) ========== */
+.form-card{
+  width:720px;max-width:100%;
+  margin:0 auto;
+  background:var(--card);
+  border-radius:12px;padding:20px 22px;
+  box-shadow: 0 10px 30px rgba(7,52,38,0.04);
+  border:1px solid rgba(7,52,38,0.04);
+  transition: box-shadow var(--transition);
+}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row{margin-bottom:12px}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+input[type="text"], input[type="email"], select, textarea{
+  width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(7,52,38,0.06);font-size:14px;
+  background:linear-gradient(180deg,#fff,#fbfffb);
+}
+textarea{min-height:100px;resize:vertical}
+.form-actions{display:flex;justify-content:flex-end;margin-top:12px;gap:8px}
+
+/* ========== Dashboard ========== */
+.dashboard-grid{
+  display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;
+}
+.panel{
+  background:var(--card);padding:18px;border-radius:12px;border:1px solid rgba(7,52,38,0.04);
+  box-shadow: 0 8px 30px rgba(7,52,38,0.04);
+}
+.farm-info{display:flex;gap:12px;align-items:center}
+.id-badge{background:linear-gradient(180deg,var(--green-3),#dff9e6);padding:10px 12px;border-radius:10px;font-weight:700;color:var(--green-1);cursor:pointer}
+.dash-actions{display:flex;gap:10px;justify-content:flex-end}
+.big-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.big-btn{
+  padding:26px;border-radius:12px;background:linear-gradient(180deg,#fff,var(--green-3));
+  display:flex;flex-direction:column;align-items:flex-start;gap:8px;border:1px solid rgba(7,52,38,0.04);
+  cursor:pointer;transition:transform var(--transition), box-shadow var(--transition);
+}
+.big-btn:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(7,52,38,0.08)}
+.big-btn h3{margin:0;color:var(--green-1)}
+.small-muted{font-size:13px;color:var(--muted)}
+
+/* ========== Lists & Cards ========== */
+.list{display:flex;flex-direction:column;gap:10px}
+.location-card{display:flex;justify-content:space-between;gap:12px;padding:12px;border-radius:10px;background:linear-gradient(90deg,#fff,#fbfff8);border:1px solid rgba(7,52,38,0.04)}
+.price{font-weight:700;color:var(--green-1)}
+
+/* ========== Advice & Dynamic content ========== */
+.advice-item{padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#f6fff4);border:1px solid rgba(7,52,38,0.04)}
+.step-list{display:flex;flex-direction:column;gap:8px}
+.step{
+  padding:12px;border-radius:8px;background:linear-gradient(180deg,#fff,#fcfff9);border-left:4px solid var(--green-2);
+}
+
+/* ========== Footer small ========== */
+.muted-footer{font-size:13px;color:var(--muted);text-align:center;margin-top:18px}
+
+/* modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(2,20,10,0.35);display:flex;align-items:center;justify-content:center;z-index:9999}
+.modal{background:var(--card);padding:16px;border-radius:12px;max-width:680px;width:100%;box-shadow:0 20px 50px rgba(2,40,20,0.25)}
+.modal h3{margin-bottom:8px}
+.history-item{padding:10px;border-radius:8px;border:1px solid rgba(7,52,38,0.04);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+
+/* responsive */
+@media (max-width:880px){
+  .dashboard-grid{grid-template-columns:1fr; }
+  header{padding:14px}
+  .marquee{font-size:16px}
+  .brand h1{font-size:15px}
+  .robot{font-size:72px}
+  .hero{padding:16px}
+}
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <header>
+      <div class="brand">
+        <div class="logo">🌾</div>
+        <div>
+          <h1>CropGuard</h1>
+          <p>A place to get accurate solutions for your pest attacks</p>
+        </div>
+      </div>
+
+  <div class="header-controls">
+    <div class="pill" id="user-display">Not signed in</div>
+    <button class="btn secondary" id="dashboardTopBtn" title="Go to dashboard" style="display:none">Dashboard</button>
+    <button id="logoutBtn" class="btn danger">Logout</button>
+  </div>
+</header>
+
+<main class="pages">
+  <!-- START PAGE -->
+  <section id="start" class="page active">
+    <div class="hero" role="region" aria-label="Start page">
+      <div class="robot" aria-hidden="true">🤖</div>
+
+      <div class="marquee-wrap" aria-hidden="false">
+        <div class="marquee">CropGuard — "A place to get accurate solutions for your pest attacks" &nbsp; • &nbsp; Accurate, localized advice for pests & weeds — Protect your yield!</div>
+      </div>
+
+      <div class="cta">
+        <button class="get-start" id="openSurvey">Get started</button>
+      </div>
+
+      <p class="muted-footer">Professional, pesticide-aware advice — built with farmers in mind.</p>
+    </div>
+  </section>
+
+  <!-- SURVEY PAGE -->
+  <section id="survey" class="page" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <h2>Farmer survey</h2>
+      <button class="btn secondary" id="surveyToDashboard">Back to Dashboard</button>
+    </div>
+
+    <div class="form-card" role="form" aria-label="Farmer survey form">
+      <form id="surveyForm">
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="farmerName">Farmer name</label>
+            <input required id="farmerName" name="farmerName" type="text" placeholder="e.g., Rajesh Kumar" />
+          </div>
+
+          <div class="form-row">
+            <label for="fieldLocation">Location of the field (village / district)</label>
+            <input required id="fieldLocation" name="fieldLocation" type="text" placeholder="e.g., Palampur, Himachal" />
+          </div>
+
+          <div class="form-row">
+            <label for="fieldSize">Size of the field (acres / hectares)</label>
+            <input required id="fieldSize" name="fieldSize" type="text" placeholder="e.g., 2 acres" />
+          </div>
+
+          <div class="form-row">
+            <label for="cropType">Crop grown</label>
+            <input required id="cropType" name="cropType" type="text" placeholder="e.g., Cotton, Wheat" />
+          </div>
+
+          <div class="form-row">
+            <label for="pestName">Name of pest attacked</label>
+            <input required id="pestName" name="pestName" type="text" placeholder="e.g., Pink ballworm" />
+          </div>
+
+          <div class="form-row">
+            <label for="notes">Additional notes (optional)</label>
+            <textarea id="notes" name="notes" placeholder="Any further observations..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn secondary" id="cancelSurvey">Cancel</button>
+          <button type="submit" class="btn">Submit & Go to Dashboard</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- DASHBOARD PAGE -->
+  <section id="dashboard" class="page" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <div class="farm-info">
+        <div class="id-badge" id="farmerBadge">Farmer</div>
+        <div>
+          <div style="font-weight:800;font-size:18px" id="farmerNameDisplay">—</div>
+          <div class="small-muted" id="farmerLocationDisplay">—</div>
+        </div>
+      </div>
+
+      <div class="dash-actions">
+        <button class="btn secondary" id="surveyAgain">Survey again</button>
+        <button class="btn secondary" id="feedbackBtn">Feedback</button>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="panel">
+        <h3>Overview</h3>
+        <p class="small-muted">Personalized dashboard based on your latest survey.</p>
+        <div style="height:16px"></div>
+
+        <div class="big-grid">
+          <div class="big-btn" id="btnMarket">
+            <h3>Market</h3>
+            <div class="small-muted">Find fertilizers, pesticides & weedicides nearby</div>
+          </div>
+
+          <div class="big-btn" id="btnAdvices">
+            <h3>Advices</h3>
+            <div class="small-muted">Pest-specific advice and home remedies</div>
+          </div>
+
+          <div class="big-btn" id="btnPestInfo">
+            <h3>Pest Info</h3>
+            <div class="small-muted">Detailed descriptions of pests & weeds</div>
+          </div>
+
+          <div class="big-btn" id="btnTreatment">
+            <h3>Treatment</h3>
+            <div class="small-muted">Step-by-step treatment & containment</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h4>Quick summary</h4>
+        <div style="height:10px"></div>
+        <div class="list" id="summaryList">
+          <div class="small-muted">Farmer: <strong id="summaryFarmer">—</strong></div>
+          <div class="small-muted">Field size: <strong id="summarySize">—</strong></div>
+          <div class="small-muted">Crop: <strong id="summaryCrop">—</strong></div>
+          <div class="small-muted">Pest: <strong id="summaryPest">—</strong></div>
+          <div style="height:14px"></div>
+          <div class="small-muted">Tip: Click any section to explore.</div>
+
+          <!-- reminders area (dynamic) -->
+          <div style="height:12px"></div>
+          <div class="small-muted" id="remindersSummary">Upcoming reminders: <strong id="remindersCount">0</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARKET PAGE -->
+  <section id="market" class="page" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2>Market – Nearby suppliers</h2>
+      <div>
+        <button class="btn secondary" id="marketToDash">Dashboard</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <p class="small-muted">Showing a few nearby locations and approximate prices for common products.</p>
+      <div style="height:12px"></div>
+
+      <div class="list" id="marketList">
+        <!-- JS will populate -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ADVICES PAGE -->
+  <section id="advices" class="page" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2>Advices — Pest-specific recommendations</h2>
+      <div>
+        <button class="btn secondary" id="advicesToDash">Dashboard</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div id="advicesContent">
+        <!-- JS will populate -->
+      </div>
+    </div>
+  </section>
+
+  <!-- PEST INFO PAGE -->
+  <section id="pestinfo" class="page" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2>Pest Information</h2>
+      <div>
+        <button class="btn secondary" id="pestinfoToDash">Dashboard</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div id="pestInfoContent">
+        <!-- JS will populate -->
+      </div>
+    </div>
+  </section>
+
+  <!-- TREATMENT PAGE -->
+  <section id="treatment" class="page" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2>Treatment — Step-by-step</h2>
+      <div>
+        <button class="btn secondary" id="treatmentToDash">Dashboard</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div id="treatmentContent">
+        <!-- JS will populate -->
+      </div>
+    </div>
+  </section>
+
+  <!-- FEEDBACK PAGE -->
+  <section id="feedback" class="page" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2>Feedback</h2>
+      <div>
+        <button class="btn secondary" id="feedbackToDash">Dashboard</button>
+      </div>
+    </div>
+
+    <div class="panel" style="text-align:center">
+      <p style="font-size:16px;font-weight:700;color:var(--green-1)">Email us</p>
+      <p style="margin-top:6px"><a href="mailto:kavya11510272@gmail.com" style="color:var(--green-2);text-decoration:none;font-weight:700">kavya11510272@gmail.com</a></p>
+      <p style="margin-top:14px;color:var(--muted)"><em>"We are always here to help you grow!"</em></p>
+    </div>
+  </section>
+
+</main>
+
+  </div>
+
+  <script>
+    /* ===================== App Logic (single-file SPA) ===================== */
+
+    // Utility: simple query
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+    // Elements
+    const pages = {
+      start: $('#start'),
+      survey: $('#survey'),
+      dashboard: $('#dashboard'),
+      market: $('#market'),
+      advices: $('#advices'),
+      pestinfo: $('#pestinfo'),
+      treatment: $('#treatment'),
+      feedback: $('#feedback')
+    };
+    const headerUser = $('#user-display');
+    const dashboardTopBtn = $('#dashboardTopBtn');
+
+    // App state persisted in localStorage
+    const STORAGE_KEY = 'cropguard_user_v1';
+    const HISTORY_KEY = 'cropguard_history_v1';
+    const REMINDERS_KEY = 'cropguard_reminders_v1';
+    let state = {
+      farmerName: '',
+      fieldLocation: '',
+      fieldSize: '',
+      cropType: '',
+      pestName: '',
+      notes: '',
+      farmerId: ''
+    };
+
+    function loadState(){
+      try{
+        const s = localStorage.getItem(STORAGE_KEY);
+        if(s) Object.assign(state, JSON.parse(s));
+      }catch(e){ console.warn(e) }
+    }
+    function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+    // history management (keep last 5 submissions)
+    function loadHistory(){
+      try{ return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }catch(e){return []}
+    }
+    function saveToHistory(entry){
+      const h = loadHistory();
+      h.unshift(entry);
+      while(h.length>5) h.pop();
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+    }
+
+    // reminders (simple local reminders saved in localStorage)
+    function loadReminders(){
+      try{ return JSON.parse(localStorage.getItem(REMINDERS_KEY) || '[]'); }catch(e){return []}
+    }
+    function saveReminders(list){ localStorage.setItem(REMINDERS_KEY, JSON.stringify(list)); }
+    function addReminder(rem){
+      const list = loadReminders();
+      list.push(rem);
+      // sort by time
+      list.sort((a,b)=> new Date(a.when) - new Date(b.when));
+      saveReminders(list);
+      renderRemindersSummary();
+      schedulePendingReminders();
+    }
+
+    // Navigation helper
+    function show(pageKey){
+      Object.keys(pages).forEach(k=>{
+        pages[k].classList.remove('active');
+        pages[k].setAttribute('aria-hidden','true');
+      });
+      pages[pageKey].classList.add('active');
+      pages[pageKey].setAttribute('aria-hidden','false');
+
+      // header small state
+      if(pageKey === 'dashboard'){
+        dashboardTopBtn.style.display = 'none';
+      } else {
+        dashboardTopBtn.style.display = state.farmerName ? 'inline-block' : 'none';
+      }
+
+      // analytics-ish small console
+      console.debug('[CropGuard] page:', pageKey);
+    }
+
+    // generate a friendly ID
+    function generateId(){
+      const t = Date.now().toString(36).slice(-6).toUpperCase();
+      const r = Math.random().toString(36).slice(2,6).toUpperCase();
+      return `${t}-${r}`;
+    }
+
+    // wire start -> survey
+    $('#openSurvey').addEventListener('click', ()=>{
+      show('survey');
+    });
+
+    // Survey: submit
+    const surveyForm = $('#surveyForm');
+    surveyForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const data = new FormData(surveyForm);
+      state.farmerName = data.get('farmerName').trim();
+      state.fieldLocation = data.get('fieldLocation').trim();
+      state.fieldSize = data.get('fieldSize').trim();
+      state.cropType = data.get('cropType').trim();
+      state.pestName = data.get('pestName').trim();
+      state.notes = data.get('notes').trim();
+      if(!state.farmerId) state.farmerId = generateId();
+      saveState();
+
+      // save snapshot to history for quick switching later
+      saveToHistory({
+        id: state.farmerId,
+        name: state.farmerName,
+        location: state.fieldLocation,
+        size: state.fieldSize,
+        crop: state.cropType,
+        pest: state.pestName,
+        notes: state.notes,
+        ts: new Date().toISOString()
+      });
+
+      refreshUI();
+      show('dashboard');
+    });
+
+    $('#cancelSurvey').addEventListener('click', ()=>{
+      // if user has data go to dashboard otherwise start
+      if(state.farmerName) show('dashboard');
+      else show('start');
+    });
+
+    // Dashboard wiring
+    function refreshUI(){
+      headerUser.textContent = state.farmerName ? `${state.farmerName} • ${state.farmerId}` : 'Not signed in';
+      $('#farmerBadge').textContent = state.farmerId ? state.farmerId : '—';
+      $('#farmerNameDisplay').textContent = state.farmerName || '—';
+      $('#farmerLocationDisplay').textContent = state.fieldLocation ? `${state.fieldLocation}` : '—';
+      $('#summaryFarmer').textContent = state.farmerName || '—';
+      $('#summarySize').textContent = state.fieldSize || '—';
+      $('#summaryCrop').textContent = state.cropType || '—';
+      $('#summaryPest').textContent = state.pestName || '—';
+      // top right dashboard button visibility
+      if(state.farmerName){
+        dashboardTopBtn.style.display = 'none';
+      } else {
+        dashboardTopBtn.style.display = 'none';
+      }
+
+      renderRemindersSummary();
+    }
+
+    // top header dashboard button goes to dashboard
+    dashboardTopBtn.addEventListener('click', ()=> show('dashboard'));
+
+    // survey again
+    $('#surveyAgain').addEventListener('click', ()=>{
+      // prefill form
+      $('#farmerName').value = state.farmerName || '';
+      $('#fieldLocation').value = state.fieldLocation || '';
+      $('#fieldSize').value = state.fieldSize || '';
+      $('#cropType').value = state.cropType || '';
+      $('#pestName').value = state.pestName || '';
+      $('#notes').value = state.notes || '';
+      show('survey');
+    });
+
+    // feedback
+    $('#feedbackBtn').addEventListener('click', ()=> show('feedback'));
+
+    // dashboard grid actions
+    $('#btnMarket').addEventListener('click', ()=> { populateMarket(); show('market'); });
+    $('#btnAdvices').addEventListener('click', ()=> { populateAdvices(); show('advices'); });
+    $('#btnPestInfo').addEventListener('click', ()=> { populatePestInfo(); show('pestinfo'); });
+    $('#btnTreatment').addEventListener('click', ()=> { populateTreatment(); show('treatment'); });
+
+    // every page except start and dashboard has a top-right Dashboard button as required
+    $('#marketToDash').addEventListener('click', ()=> show('dashboard'));
+    $('#advicesToDash').addEventListener('click', ()=> show('dashboard'));
+    $('#pestinfoToDash').addEventListener('click', ()=> show('dashboard'));
+    $('#treatmentToDash').addEventListener('click', ()=> show('dashboard'));
+    $('#feedbackToDash').addEventListener('click', ()=> show('dashboard'));
+    $('#surveyToDashboard').addEventListener('click', ()=> show('dashboard'));
+
+    // ========== Content generation data ==========
+
+    // Example market data (mock). Real app would call an API.
+    const marketData = [
+      {
+        location: "Green Agro Store, Central Market",
+        items: [
+          {name:"Urea (50kg)", price:"₹1,100"},
+          {name:"Lambda-cyhalothrin insecticide (1L)", price:"₹420"},
+          {name:"Glyphosate (1L)", price:"₹280"}
+        ],
+        distance:"3.2 km"
+      },
+      {
+        location: "Rural Supplies, East Bazaar",
+        items: [
+          {name:"DAP (50kg)", price:"₹2,100"},
+          {name:"Azadirachtin (biopesticide) (250ml)", price:"₹260"}
+        ],
+        distance:"7.8 km"
+      },
+      {
+        location: "Farmers' Co-op, Village Center",
+        items: [
+          {name:"Organic compost (50kg)", price:"₹450"},
+          {name:"Neem oil (1L)", price:"₹350"},
+          {name:"Recommended weedicides (small)", price:"₹150"}
+        ],
+        distance:"1.6 km"
+      }
+    ];
+
+// pest encyclopedia with 50 entries
+const pestEncyclopedia = {
+  "pink ballworm": {
+    commonName: "Pink Ballworm",
+    description: "A caterpillar that bores into cotton bolls and other fruits causing yield loss.",
+    signs: ["Holes in bolls or fruit", "Frass (sawdust-like droppings)", "Premature fruit drop"],
+    biology: "Larvae bore into fruit; several generations per year depending on climate."
+  },
+  "aphids": {
+    commonName: "Aphids",
+    description: "Small soft-bodied insects that suck plant sap and may transmit viruses.",
+    signs: ["Curling leaves", "Sticky honeydew", "Sooty mold"],
+    biology: "Rapid reproduction; often controlled by natural enemies or insecticidal soaps."
+  },
+  "stem borer": {
+    commonName: "Stem Borer",
+    description: "Moth larvae that bore into stems, weakening plants and causing lodging.",
+    signs: ["Yellowing", "Dead heart in seedlings", "Holes in stems"],
+    biology: "Eggs laid on leaves; larvae bore into stem soon after hatching."
+  },
+  "weeds (general)": {
+    commonName: "Weeds",
+    description: "Competing plants that reduce yield; control through cultural, mechanical or chemical methods.",
+    signs: ["Dense unwanted plants", "Reduced crop vigor"],
+    biology: "Various species; identification helps select correct control."
+  },
+  "whitefly": {
+    commonName: "Whitefly",
+    description: "Tiny white insects on undersides of leaves that suck sap.",
+    signs: ["Yellowing leaves", "Sticky honeydew"],
+    biology: "Rapid reproduction; controlled by neem oil or natural predators."
+  },
+  "red spider mite": {
+    commonName: "Red Spider Mite",
+    description: "Tiny red mites causing webbing and yellowing leaves.",
+    signs: ["Red dots on leaves", "Webbing on leaves"],
+    biology: "Thrives in hot, dry conditions; use miticides or neem oil."
+  },
+  "cutworm": {
+    commonName: "Cutworm",
+    description: "Larvae that cut seedlings at the base causing plant death.",
+    signs: ["Seedlings cut at base", "Wilting plants"],
+    biology: "Nocturnal larvae; controlled by removing plant debris and using collars."
+  },
+  "leaf roller": {
+    commonName: "Leaf Roller",
+    description: "Caterpillars that roll leaves together and feed inside.",
+    signs: ["Rolled leaves", "Larvae inside leaves"],
+    biology: "Eggs laid on leaves; larvae feed inside rolled leaves."
+  },
+  "brown plant hopper": {
+    commonName: "Brown Plant Hopper",
+    description: "Insects sucking sap from rice causing yellowing and stunting.",
+    signs: ["Yellowing leaves", "Stunted growth", "Drying of tips"],
+    biology: "Spreads rapidly; controlled by insecticides and light traps."
+  },
+  "fruit spot": {
+    commonName: "Fruit Spot",
+    description: "Fungal infection causing spots on fruits and premature rot.",
+    signs: ["Brown or black spots on fruits", "Fruit rot"],
+    biology: "Fungi survive on fallen fruits; control by removing affected fruits."
+  },
+  "rust fungus": {
+    commonName: "Rust Fungus",
+    description: "Fungal disease producing orange pustules on leaves.",
+    signs: ["Orange-brown pustules", "Reduced yield"],
+    biology: "Spread by wind; fungicides and resistant varieties help control."
+  },
+  "powdery mildew": {
+    commonName: "Powdery Mildew",
+    description: "Fungal disease forming white powdery coating on leaves.",
+    signs: ["White coating on leaves", "Leaves curl and dry"],
+    biology: "Thrives in humid conditions; use sulfur-based fungicides."
+  },
+  "root-knot nematode": {
+    commonName: "Root-Knot Nematode",
+    description: "Microscopic worms causing galls on roots and stunted growth.",
+    signs: ["Knots or galls on roots", "Yellowing leaves", "Stunted growth"],
+    biology: "Soil-borne; crop rotation and nematicides are effective."
+  },
+  "mealybug": {
+    commonName: "Mealybug",
+    description: "White cotton-like insects feeding on sap causing wilting.",
+    signs: ["White cottony covering", "Wilting leaves"],
+    biology: "Controlled by neem oil and natural predators like ladybugs."
+  },
+  "thrips": {
+    commonName: "Thrips",
+    description: "Tiny insects causing silvery streaks and flower distortion.",
+    signs: ["Silvery streaks on leaves", "Distorted flowers"],
+    biology: "Controlled with sticky traps and insecticidal soaps."
+  },
+  "leaf miner": {
+    commonName: "Leaf Miner",
+    description: "Larvae burrow inside leaves creating winding mines.",
+    signs: ["Serpentine mines", "Yellowing leaves"],
+    biology: "Controlled by removing affected leaves and using neem oil."
+  },
+  "fruit fly": {
+    commonName: "Fruit Fly",
+    description: "Insects that lay eggs inside fruits causing maggot infestation.",
+    signs: ["Small puncture marks", "Maggots inside fruit"],
+    biology: "Controlled by traps and destroying infested fruits."
+  },
+  "black spot": {
+    commonName: "Black Spot",
+    description: "Fungal disease causing black spots on leaves.",
+    signs: ["Black spots", "Leaf yellowing and drop"],
+    biology: "Control by removing infected leaves and applying fungicides."
+  },
+  "downy mildew": {
+    commonName: "Downy Mildew",
+    description: "Fungal infection with white downy growth on leaf undersides.",
+    signs: ["Yellow or pale leaf spots", "White downy growth"],
+    biology: "Controlled by fungicides and proper ventilation."
+  },
+  "leaf blight": {
+    commonName: "Leaf Blight",
+    description: "Fungal disease causing brown lesions and early leaf drying.",
+    signs: ["Brown lesions", "Premature leaf drying"],
+    biology: "Controlled with fungicides and removing infected leaves."
+  },
+  "club root": {
+    commonName: "Club Root",
+    description: "Soil-borne disease causing swollen roots and stunted plants.",
+    signs: ["Club-shaped roots", "Stunted growth"],
+    biology: "Use disease-free seeds, crop rotation, and lime soil."
+  },
+  "mosaic virus": {
+    commonName: "Mosaic Virus",
+    description: "Virus causing mottled leaves and distorted growth.",
+    signs: ["Mottled leaves", "Distorted plants"],
+    biology: "Remove infected plants and control insect vectors."
+  },
+  "bollworm": {
+    commonName: "Bollworm",
+    description: "Caterpillar feeding inside cotton bolls or other fruits.",
+    signs: ["Holes in bolls", "Larvae inside fruits"],
+    biology: "Use pheromone traps and insecticides."
+  },
+  "mealybug wilt": {
+    commonName: "Mealybug Wilt",
+    description: "Disease caused by mealybug infestation on grapevines.",
+    signs: ["Leaf curl", "Vine wilting"],
+    biology: "Prune affected parts and control mealybugs."
+  },
+  "blister beetle": {
+    commonName: "Blister Beetle",
+    description: "Beetles that chew leaves causing defoliation.",
+    signs: ["Chewed leaves", "Presence of beetles"],
+    biology: "Handpick beetles, neem spray, maintain hygiene."
+  },
+  "stem gall": {
+    commonName: "Stem Gall",
+    description: "Swollen galls on stems caused by insects or bacteria.",
+    signs: ["Swollen stems", "Stunted growth"],
+    biology: "Remove affected parts and use neem oil."
+  },
+  "powdery scab": {
+    commonName: "Powdery Scab",
+    description: "Fungal disease affecting potato tubers.",
+    signs: ["Powdery lesions on tubers", "Malformed roots"],
+    biology: "Use certified seeds, crop rotation, avoid waterlogging."
+  },
+  "cercospora leaf spot": {
+    commonName: "Cercospora Leaf Spot",
+    description: "Fungal infection causing leaf spots with purple margins.",
+    signs: ["Brown or grey leaf spots", "Purple margins"],
+    biology: "Remove infected leaves and apply fungicides."
+  },
+  "rice blast": {
+    commonName: "Rice Blast",
+    description: "Fungal disease causing diamond-shaped lesions on rice leaves.",
+    signs: ["Diamond-shaped lesions", "Neck rot in panicles"],
+    biology: "Use resistant varieties and balanced fertilization."
+  },
+  "smut fungus": {
+    commonName: "Smut Fungus",
+    description: "Fungal disease producing black powdery masses in grains.",
+    signs: ["Black powdery masses", "Reduced grain quality"],
+    biology: "Use disease-free seeds and fungicides."
+  },
+  "gall midge": {
+    commonName: "Gall Midge",
+    description: "Insect causing swollen shoots in rice and wheat.",
+    signs: ["Swollen leaf shoots", "Larvae inside shoots"],
+    biology: "Remove infested shoots and apply insecticides."
+  },
+  "armyworm": {
+    commonName: "Armyworm",
+    description: "Caterpillars feeding on leaves of cereals and grasses.",
+    signs: ["Leaf defoliation", "Larvae feeding at night"],
+    biology: "Use biological predators or insecticides."
+  },
+  "cabbage caterpillar": {
+    commonName: "Cabbage Caterpillar",
+    description: "Larvae feeding on cabbage leaves causing holes.",
+    signs: ["Holes in leaves", "Larvae on undersides"],
+    biology: "Remove manually or use Bt sprays."
+  },
+  "diamondback moth": {
+    commonName: "Diamondback Moth",
+    description: "Small moth larvae feeding on crucifer leaves.",
+    signs: ["Leaf skeletonization", "Presence of larvae"],
+    biology: "Use traps, neem oil, or Bt sprays."
+  },
+  "cotton aphid": {
+    commonName: "Cotton Aphid",
+    description: "Small sap-sucking insects on cotton plants.",
+    signs: ["Curling leaves", "Sticky honeydew"],
+    biology: "Controlled by natural predators or neem oil."
+  },
+  "green peach aphid": {
+    commonName: "Green Peach Aphid",
+    description: "Aphid affecting multiple vegetables and fruits.",
+    signs: ["Leaf curling", "Honeydew secretion"],
+    biology: "Use insecticidal soaps or natural predators."
+  },
+  "rice hispa": {
+    commonName: "Rice Hispa",
+    description: "Beetles feeding on rice leaves causing linear white streaks.",
+    signs: ["White streaks on leaves", "Stunted growth"],
+    biology: "Use light traps and insecticides."
+  },
+  "cotton leafworm": {
+    commonName: "Cotton Leafworm",
+    description: "Caterpillar feeding on cotton leaves causing defoliation.",
+    signs: ["Leaf feeding", "Presence of larvae"],
+    biology: "Use pheromone traps and Bt sprays."
+  },
+  "spotted bollworm": {
+    commonName: "Spotted Bollworm",
+    description: "Larvae feed inside cotton bolls causing damage.",
+    signs: ["Holes in bolls", "Larvae inside"],
+    biology: "Pheromone traps and insecticide sprays."
+  },
+  "potato tuber moth": {
+    commonName: "Potato Tuber Moth",
+    description: "Larvae bore into potato tubers causing rot.",
+    signs: ["Holes in tubers", "Frass inside tubers"],
+    biology: "Use pheromone traps and remove infested tubers."
+  },
+  "cucumber beetle": {
+    commonName: "Cucumber Beetle",
+    description: "Beetle feeding on cucumber leaves and flowers.",
+    signs: ["Chewed leaves", "Damaged flowers"],
+    biology: "Handpick beetles, use neem spray."
+  },
+  "spider mite": {
+    commonName: "Spider Mite",
+    description: "Tiny mites causing yellow spots and webbing on leaves.",
+    signs: ["Yellow spots", "Webbing on leaves"],
+    biology: "Use miticides or neem oil, maintain field moisture."
+  },
+  "leafhopper": {
+    commonName: "Leafhopper",
+    description: "Sap-sucking insect causing yellowing and curling of leaves.",
+    signs: ["Leaf yellowing", "Curling leaves"],
+    biology: "Use insecticidal sprays and remove weeds."
+  },
+  "mealybug on citrus": {
+    commonName: "Mealybug (Citrus)",
+    description: "White cotton-like insects sucking sap from citrus trees.",
+    signs: ["Leaf curling", "Honeydew secretion"],
+    biology: "Spray neem oil and introduce ladybugs."
+  }
+};
+
+    // advices generator (basic, example-based)
+    function generateAdviceFor(pestName){
+      const key = (pestName || '').trim().toLowerCase();
+      if(!key) return {
+        title: "No pest specified",
+        advices: ["Please fill in pest name in the survey for tailored advice."]
+      };
+
+      if(key.includes('pink') && key.includes('ball')){
+        return {
+          title: "Pink Ballworm — tailored advice",
+          advices:[
+            "Inspect bolls regularly. Remove and destroy infested bolls to reduce larvae.",
+            "Use pheromone traps to monitor adult moth activity and time control.",
+            "Apply appropriate insecticides at egg hatch or early larval stages (consult local extension for approved chemicals and timing).",
+            "Encourage natural predators (lacewings, parasitoids). Avoid broad-spectrum sprays that kill beneficial insects.",
+            "Rotate crops and manage volunteer plants to break life-cycle."
+          ],
+          homeRemedies: [
+            "Timely hand-removal of infested bolls.",
+            "Deploy light or pheromone traps to reduce adult numbers.",
+            "Maintain field hygiene to reduce refuge for larvae."
+          ]
+        };
+      }
+
+      if(key.includes('aphid')){
+        return {
+          title: "Aphids — practical steps",
+          advices:[
+            "Release/encourage natural enemies (ladybirds, lacewings).",
+            "Use strong water sprays to dislodge colonies on small plants.",
+            "Apply insecticidal soap or neem-based products for localized infestations.",
+            "Avoid high-nitrogen fertilizer which encourages aphid outbreaks."
+          ],
+          homeRemedies: [
+            "Spray a mild solution of neem oil + soap (spot test first).",
+            "Use reflective mulches in some crops to reduce settlement."
+          ]
+        };
+      }
+
+      if(key.includes('stem') || key.includes('borer')){
+        return {
+          title: "Stem borer — containment & treatment",
+          advices:[
+            "Destroy infested stubbles and residues after harvest.",
+            "Use pheromone or light traps to reduce adults",
+            "Apply selective insecticides targeting early larvae (follow local recommendations)."
+          ],
+          homeRemedies:[
+            "Uproot and burn heavily infested plants to reduce larval population.",
+            "Crop rotation and resistant varieties when available."
+          ]
+        };
+      }
+
+      // default generic response
+      return {
+        title: `Advice for "${pestName}"`,
+        advices:[
+          "Confirm the pest identity before applying any chemical control.",
+          "Monitor pest levels regularly and take action based on thresholds.",
+          "Prefer IPM (Integrated Pest Management): combine cultural, biological and chemical tactics.",
+          "Consult local agricultural extension for exact product names and dosages."
+        ],
+        homeRemedies:[
+          "Hand removal where feasible for small infestations.",
+          "Neem-based sprays for many chewing/sucking pests as a low-toxicity option."
+        ]
+      };
+    }
+
+    // treatment generator (simple steps)
+    function generateTreatmentFor(pestName){
+      const p = (pestName||'').toLowerCase();
+      if(!p) return [{title:'No pest specified', steps:['Complete the survey with a pest name to get a treatment plan.']}];
+
+      if(p.includes('pink') && p.includes('ball')){
+        return [
+          {title:'Step 1 — Assess', steps:['Survey all plants and mark infested bolls. Determine infestation percentage.']},
+          {title:'Step 2 — Sanitation', steps:['Remove infested bolls and destroy them off-field. Remove volunteers.']},
+          {title:'Step 3 — Monitoring', steps:['Deploy pheromone traps and monitor adult catches to time sprays.']},
+          {title:'Step 4 — Chemical control (when necessary)', steps:['Use a recommended insecticide at recommended dose targeting early larvae (consult extension). Wear PPE.']},
+          {title:'Step 5 — Follow-up', steps:['Re-check fields 7–10 days after treatment. Record results and adjust actions.']}
+        ];
+      }
+
+      // generic treatment
+      return [
+        {title:'Step 1 — Confirm & Monitor', steps:['Identify the pest correctly. Monitor population density.']},
+        {title:'Step 2 — Cultural controls', steps:['Remove infected plant parts, rotate crops, adjust irrigation/fertilization to reduce pest favorability.']},
+        {title:'Step 3 — Biological controls', steps:['Encourage predators or use biopesticides where available.']},
+        {title:'Step 4 — Chemical controls (last resort)', steps:['Choose targeted, approved products and follow label instructions.']},
+        {title:'Step 5 — Record & Evaluate', steps:['Log interventions and outcomes; adapt strategy next season.']}
+      ];
+    }
+
+    // ================= Populate pages =================
+
+    function populateMarket(){
+      const wrap = $('#marketList');
+      wrap.innerHTML = '';
+      marketData.forEach(loc=>{
+        const el = document.createElement('div');
+        el.className = 'location-card';
+        el.innerHTML = `
+          <div>
+            <div style="font-weight:800">${loc.location}</div>
+            <div class="small-muted">${loc.distance}</div>
+            <div style="height:8px"></div>
+            <div>${loc.items.map(i=>`<div style="font-size:14px">${i.name} — <span class="price">${i.price}</span></div>`).join('')}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:8px">
+            <button class="btn" style="padding:8px 10px" onclick="alert('Open directions on your device — demo only')">Get directions</button>
+            <button class="btn secondary" style="padding:8px 10px" onclick="alert('Call supplier — demo only')">Contact</button>
+          </div>
+        `;
+        wrap.appendChild(el);
+      });
+
+      // small enhancement: allow exporting market list as CSV via keyboard (Ctrl+M)
+      // handled globally; we only populate data here.
+    }
+
+    function populatePestInfo(){
+      const wrap = $('#pestInfoContent');
+      wrap.innerHTML = '';
+
+      // add a small search box (non-intrusive) to find pests quickly
+      const searchContainer = document.createElement('div');
+      searchContainer.style.marginBottom = '12px';
+      searchContainer.innerHTML = `
+        <input id="pestSearch" placeholder="Search pests (type name)..." style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(7,52,38,0.06);font-size:14px" />
+      `;
+      wrap.appendChild(searchContainer);
+
+      const listWrap = document.createElement('div');
+      wrap.appendChild(listWrap);
+
+      function render(filter=''){
+        listWrap.innerHTML = '';
+        const keys = Object.keys(pestEncyclopedia).filter(k=> k.includes(filter.toLowerCase()));
+        if(keys.length === 0){
+          listWrap.innerHTML = `<div class="small-muted">No pests found for "${escapeHtml(filter)}"</div>`;
+          return;
+        }
+        keys.forEach(key=>{
+          const p = pestEncyclopedia[key];
+          const card = document.createElement('div');
+          card.className = 'advice-item';
+          card.style.marginBottom = '12px';
+          card.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+              <div>
+                <div style="font-weight:800">${p.commonName}</div>
+                <div class="small-muted" style="margin-top:6px">${p.description}</div>
+                <div style="height:8px"></div>
+                <div style="font-size:13px"><strong>Signs:</strong> ${p.signs.join(', ')}</div>
+                <div style="font-size:13px;margin-top:6px"><strong>Biology:</strong> ${p.biology}</div>
+              </div>
+              <div style="text-align:right">
+                <button class="btn secondary" onclick="showAdviceFromInfo('${escapeHtml(key)}')">Get specific advice</button>
+              </div>
+            </div>
+          `;
+          listWrap.appendChild(card);
+        });
+      }
+
+      // wire search
+      $('#pestSearch').addEventListener('input', (e)=> render(e.target.value));
+      render('');
+
+      // small helper function exposed globally for the inline onclick to work
+      window.showAdviceFromInfo = function(pKey){
+        show('advices');
+        // unescape
+        const key = pKey;
+        state.pestName = key;
+        saveState();
+        populateAdvices();
+      };
+    }
+
+    function populateAdvices(){
+      const wrap = $('#advicesContent');
+      wrap.innerHTML = '';
+
+      const pest = state.pestName || '';
+      const advice = generateAdviceFor(pest);
+
+      const heading = document.createElement('div');
+      heading.innerHTML = `<h3 style="margin-bottom:8px">${advice.title}</h3><div class="small-muted">Based on: <strong>${pest || '—'}</strong></div><div style="height:12px"></div>`;
+      wrap.appendChild(heading);
+
+      // advices
+      advice.advices.forEach(a=>{
+        const it = document.createElement('div');
+        it.className = 'advice-item';
+        it.innerHTML = `<div style="font-weight:700;margin-bottom:6px">Recommended</div><div style="color:var(--muted)">${a}</div>`;
+        wrap.appendChild(it);
+      });
+
+      // home remedies
+      if(advice.homeRemedies && advice.homeRemedies.length){
+        const hrWrap = document.createElement('div');
+        hrWrap.style.marginTop = '12px';
+        hrWrap.innerHTML = `<div style="font-weight:700;margin-bottom:8px">Home remedies / low-toxicity options</div>`;
+        advice.homeRemedies.forEach(h=>{
+          const it = document.createElement('div');
+          it.className = 'advice-item';
+          it.style.marginTop = '8px';
+          it.innerHTML = `<div style="color:var(--muted)">${h}</div>`;
+          hrWrap.appendChild(it);
+        });
+        wrap.appendChild(hrWrap);
+      }
+
+      // safety note
+      const note = document.createElement('div');
+      note.style.marginTop = '14px';
+      note.className = 'small-muted';
+      note.textContent = 'Safety: Always check local extension recommendations and registered products for your region. Use Personal Protective Equipment when handling chemicals.';
+      wrap.appendChild(note);
+
+      // quick tiny feature: allow adding a reminder related to this advice via keyboard shortcut (press "R" while on Advices)
+    }
+
+    function populateTreatment(){
+      const wrap = $('#treatmentContent');
+      wrap.innerHTML = '';
+      const pest = state.pestName || '';
+      const plan = generateTreatmentFor(pest);
+
+      plan.forEach(item=>{
+        const card = document.createElement('div');
+        card.className = 'advice-item';
+        card.style.marginBottom = '12px';
+        card.innerHTML = `<div style="font-weight:800;margin-bottom:8px">${item.title}</div>
+          <div class="step-list">
+            ${item.steps.map(s=>`<div class="step">${escapeHtml(s)}</div>`).join('')}
+          </div>`;
+        wrap.appendChild(card);
+      });
+
+      const caution = document.createElement('div');
+      caution.className = 'small-muted';
+      caution.style.marginTop = '12px';
+      caution.textContent = 'Note: This is a general plan—consult local plant protection/extension services for region-specific treatments and exact product dosages.';
+      wrap.appendChild(caution);
+    }
+
+    // Escape html helper for inline usage
+    function escapeHtml(s){
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // render reminders summary
+    function renderRemindersSummary(){
+      const list = loadReminders();
+      const now = new Date();
+      const upcoming = list.filter(r=> new Date(r.when) > now);
+      $('#remindersCount').textContent = upcoming.length;
+    }
+
+    // schedule pending reminders (only works while page open; will trigger notifications if allowed)
+    let scheduledTimeouts = [];
+    function schedulePendingReminders(){
+      // clear previous
+      scheduledTimeouts.forEach(t=>clearTimeout(t));
+      scheduledTimeouts = [];
+      const list = loadReminders();
+      const now = Date.now();
+      list.forEach(r=>{
+        const when = new Date(r.when).getTime();
+        const ms = when - now;
+        if(ms>0 && ms < 1000*60*60*24*7){ // schedule only for reminders within 7 days to avoid crazy timers
+          const t = setTimeout(()=>{
+            try{ notify(`${r.title}`, r.note || 'Reminder from CropGuard'); }catch(e){}
+          }, ms);
+          scheduledTimeouts.push(t);
+        }
+      });
+    }
+
+    // Simple notification helper
+    function notify(title, body){
+      if('Notification' in window && Notification.permission === 'granted'){
+        new Notification(title, {body});
+      } else if('Notification' in window && Notification.permission !== 'denied'){
+        Notification.requestPermission().then(p=>{ if(p==='granted') new Notification(title,{body}); });
+      } else {
+        alert(title + "\n" + body);
+      }
+    }
+
+    // ================= Initialization =================
+    loadState();
+    refreshUI();
+
+    // If user already provided data, go to dashboard, else start page
+    if(state.farmerName) {
+      // ensure form prefilled
+      $('#farmerName').value = state.farmerName;
+      $('#fieldLocation').value = state.fieldLocation;
+      $('#fieldSize').value = state.fieldSize;
+      $('#cropType').value = state.cropType;
+      $('#pestName').value = state.pestName;
+      $('#notes').value = state.notes;
+      show('dashboard');
+    } else {
+      show('start');
+    }
+
+    // small accessibility: pressing Esc returns to dashboard
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape') show('dashboard');
+    });
+
+    // micro-animations: re-trigger marquee when focus changes (keeps lively)
+    document.addEventListener('visibilitychange', ()=>{
+      if(!document.hidden){
+        const m = document.querySelector('.marquee');
+        if(m){
+          m.style.animation = 'none';
+          void m.offsetWidth;
+          m.style.animation = '';
+        }
+      }
+    });
+
+    // Expose a tiny debug function to clear storage (for dev)
+    window._cropguard_clear = function(){
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(HISTORY_KEY);
+      localStorage.removeItem(REMINDERS_KEY);
+      location.reload();
+    };
+
+    // ----------------- New small UX goodies -----------------
+
+    // 1) Clicking farmerBadge opens a small history modal (last 5 surveys) to quickly switch between past entries
+    document.getElementById('farmerBadge').addEventListener('click', ()=>{
+      const history = loadHistory();
+      const modal = document.createElement('div');
+      modal.className = 'modal-backdrop';
+      modal.innerHTML = `<div class="modal"><h3>Recent surveys</h3><div id="historyList"></div><div style="height:8px"></div><div style="text-align:right"><button id="closeHist" class="btn secondary">Close</button></div></div>`;
+      document.body.appendChild(modal);
+      const listEl = modal.querySelector('#historyList');
+      if(history.length===0) listEl.innerHTML = '<div class="small-muted">No prior surveys</div>';
+      history.forEach(h=>{
+        const it = document.createElement('div');
+        it.className = 'history-item';
+        it.innerHTML = `<div><div style="font-weight:800">${escapeHtml(h.name || '—')}</div><div class="small-muted">${escapeHtml(h.crop || '')} • ${new Date(h.ts).toLocaleString()}</div></div><div style="display:flex;gap:8px"><button class="btn" data-id="${h.id}">Load</button><button class="btn secondary" data-delete="${h.id}">Delete</button></div>`;
+        listEl.appendChild(it);
+      });
+
+      // handlers
+      listEl.addEventListener('click', (ev)=>{
+        const btn = ev.target.closest('button');
+        if(!btn) return;
+        if(btn.dataset.id){
+          const id = btn.dataset.id;
+          const h = history.find(x=>x.id===id);
+          if(h){
+            state = Object.assign(state, {
+              farmerName: h.name,
+              fieldLocation: h.location,
+              fieldSize: h.size,
+              cropType: h.crop,
+              pestName: h.pest,
+              notes: h.notes,
+              farmerId: h.id
+            });
+            saveState();
+            refreshUI();
+            // prefill form fields too
+            $('#farmerName').value = state.farmerName || '';
+            $('#fieldLocation').value = state.fieldLocation || '';
+            $('#fieldSize').value = state.fieldSize || '';
+            $('#cropType').value = state.cropType || '';
+            $('#pestName').value = state.pestName || '';
+            $('#notes').value = state.notes || '';
+            modal.remove();
+            show('dashboard');
+          }
+        }
+        if(btn.dataset.delete){
+          const id = btn.dataset.delete;
+          const newHist = history.filter(x=> x.id !== id);
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(newHist));
+          modal.remove();
+        }
+      });
+
+      modal.querySelector('#closeHist').addEventListener('click', ()=> modal.remove());
+    });
+
+    // 2) Keyboard shortcuts: Ctrl+E exports current user data (JSON); Ctrl+I imports JSON; Ctrl+R quick reminder; Ctrl+M export market as CSV
+    document.addEventListener('keydown', (e)=>{
+      if(e.ctrlKey && e.key.toLowerCase()==='e'){
+        e.preventDefault();
+        const data = JSON.stringify(state, null, 2);
+        const blob = new Blob([data], {type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `cropguard_${state.farmerId || 'export'}.json`; a.click();
+        URL.revokeObjectURL(url);
+      }
+      if(e.ctrlKey && e.key.toLowerCase()==='i'){
+        e.preventDefault();
+        const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
+        inp.onchange = ()=>{
+          const file = inp.files[0]; if(!file) return;
+          const reader = new FileReader();
+          reader.onload = ()=>{
+            try{ const obj = JSON.parse(reader.result); Object.assign(state, obj); saveState(); refreshUI(); alert('Imported!'); }catch(err){ alert('Invalid JSON file') }
+          };
+          reader.readAsText(file);
+        };
+        inp.click();
+      }
+      if(e.ctrlKey && e.key.toLowerCase()==='r'){
+        e.preventDefault();
+        quickAddReminder();
+      }
+      if(e.ctrlKey && e.key.toLowerCase()==='m'){
+        e.preventDefault();
+        exportMarketCSV();
+      }
+    });
+
+    // 3) quickAddReminder uses prompt (non-blocking) to collect minimal info
+    function quickAddReminder(){
+      const title = prompt('Reminder title (e.g., "Spray for pink ballworm")');
+      if(!title) return;
+      const whenRaw = prompt('When? (enter a date/time in ISO format or like "2025-10-25 09:00")');
+      if(!whenRaw) return;
+      const when = new Date(whenRaw);
+      if(isNaN(when.getTime())){ alert('Invalid date'); return; }
+      const note = prompt('Optional note');
+      addReminder({title, when: when.toISOString(), note});
+      alert('Reminder saved — you will be notified if the tab is open and/or via system notifications (if allowed).');
+    }
+
+    // 4) export market as CSV
+    function exportMarketCSV(){
+      const rows = [['location','distance','item','price']];
+      marketData.forEach(loc=>{
+        loc.items.forEach(it=> rows.push([loc.location, loc.distance, it.name, it.price]));
+      });
+      const csv = rows.map(r=> r.map(c=> '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'market_list.csv'; a.click(); URL.revokeObjectURL(url);
+    }
+
+    // schedule reminders on load
+    schedulePendingReminders();
+
+    // render reminders on load
+    renderRemindersSummary();
+
+    // small friendly console message
+    console.log('%cCropGuard loaded — happy farming!','color: #0a7a50; font-weight:700');
+    // ---------- Simple in-app reminder notifications (no permissions) ----------
+
+// tiny in-page toast used for reminder display
+function showInPageToast(text){
+  // create container
+  if(!document.getElementById('cg-toast')){
+    const t = document.createElement('div');
+    t.id = 'cg-toast';
+    t.style.position = 'fixed';
+    t.style.right = '18px';
+    t.style.bottom = '18px';
+    t.style.maxWidth = '340px';
+    t.style.padding = '12px 14px';
+    t.style.background = '#ffffff';
+    t.style.border = '1px solid rgba(7,52,38,0.08)';
+    t.style.boxShadow = '0 8px 30px rgba(7,52,38,0.06)';
+    t.style.borderRadius = '10px';
+    t.style.zIndex = 100000;
+    t.style.fontSize = '14px';
+    t.style.color = '#073426';
+    t.style.fontWeight = 600;
+    document.body.appendChild(t);
+  }
+  const el = document.getElementById('cg-toast');
+  el.textContent = text;
+  el.style.opacity = '1';
+  el.style.transition = 'none';
+  // fade after 8s
+  setTimeout(()=>{
+    el.style.transition = 'opacity 400ms';
+    el.style.opacity = '0';
+    setTimeout(()=> { if(el.parentNode) el.parentNode.removeChild(el); }, 600);
+  }, 8000);
+}
+
+// in-app reminder checker: shows toast (or alert fallback) when reminders become due
+function runInAppReminderChecker(){
+  const list = loadReminders();
+  const now = Date.now();
+  let changed = false;
+
+  list.forEach((r, idx) => {
+    // skip already fired reminders
+    if(r.firedAt) return;
+    const when = new Date(r.when).getTime();
+    if(!isNaN(when) && when <= now){
+      // Show a toast (preferred)
+      try {
+        showInPageToast(`Reminder: ${r.title}${r.note ? ' — ' + r.note : ''}`);
+      } catch (e) {
+        // fallback to alert if toast fails
+        try { alert(`Reminder: ${r.title}\n${r.note || ''}`); } catch (err) {}
+      }
+
+      // mark fired so we don't show again
+      list[idx].firedAt = new Date().toISOString();
+      changed = true;
+    }
+  });
+
+  if(changed) {
+    saveReminders(list);
+    renderRemindersSummary();
+  }
+}
+
+// run immediately and then every 30 seconds
+runInAppReminderChecker();
+if(window._cropguard_inapp_interval) clearInterval(window._cropguard_inapp_interval);
+window._cropguard_inapp_interval = setInterval(runInAppReminderChecker, 30 * 1000);
+
+// helper to create a quick test reminder 1 minute from now
+function createTestReminderInApp(){
+  const when = new Date(Date.now() + 60 * 1000);
+  addReminder({ title: 'Test reminder (1 minute)', when: when.toISOString(), note: 'In-app test' });
+  alert('Test reminder scheduled for ' + when.toLocaleString() + '. Keep this tab open.');
+}
+    // Logout button handler
+const logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to log out?')) {
+      localStorage.clear(); // clear stored data
+      alert('You have been logged out.');
+      location.reload(); // reload to return to home/login
+    }
+  });
+}
+
+  </script>
+
+</body>
+</html>
